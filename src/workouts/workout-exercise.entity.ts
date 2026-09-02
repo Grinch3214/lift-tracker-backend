@@ -4,8 +4,10 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
 } from 'typeorm';
+import { SetEntry } from './set-entry.entity';
 import { Workout } from './workout.entity';
 
 @Entity('workout_exercises')
@@ -31,4 +33,7 @@ export class WorkoutExercise {
 
   @Column({ type: 'integer', nullable: true })
   order: number | null;
+
+  @OneToMany(() => SetEntry, (setEntry) => setEntry.workoutExercise)
+  setEntries: SetEntry[];
 }

@@ -4,10 +4,12 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
   Unique,
 } from 'typeorm';
 import { User } from '../users/user.entity';
+import { WorkoutExercise } from './workout-exercise.entity';
 
 @Entity('workouts')
 @Unique('workouts_user_id_date_key', ['userId', 'date'])
@@ -34,4 +36,10 @@ export class Workout {
 
   @Column({ type: 'timestamptz', name: 'updated_at', default: () => 'now()' })
   updatedAt: Date;
+
+  @OneToMany(
+    () => WorkoutExercise,
+    (workoutExercise) => workoutExercise.workout,
+  )
+  workoutExercises: WorkoutExercise[];
 }
