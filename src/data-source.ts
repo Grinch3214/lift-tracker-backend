@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { RefreshToken } from './auth/refresh-token.entity';
 import { User } from './users/user.entity';
 import { Workout } from './workouts/workout.entity';
 import { WorkoutExercise } from './workouts/workout-exercise.entity';
@@ -12,8 +13,10 @@ export const dataSourceOptions: DataSourceOptions = {
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DATABASE,
-  entities: [User, Workout, WorkoutExercise, SetEntry],
-  migrations: ['src/migrations/*.ts'],
+  entities: [User, RefreshToken, Workout, WorkoutExercise, SetEntry],
+  // __dirname — это src/ под ts-node (CLI-миграции) и dist/ в собранном приложении,
+  // поэтому паттерн сам подхватывает нужное расширение в каждом случае
+  migrations: [__dirname + '/migrations/*{.ts,.js}'],
   synchronize: false, // схема меняется только через миграции, никогда автоматически
 };
 

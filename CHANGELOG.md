@@ -26,3 +26,19 @@
 
 - Stack: raw SQL (`pg`) → TypeORM (see `DECISIONS.md`).
 - `ARCHITECTURE.md` updated to match (stack section, open questions).
+
+## 2026-09-02
+
+### Added
+
+- Auth: `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh` (rotates the refresh token), `POST /auth/logout` (revokes it, idempotent) — email+password only, Google OAuth deferred. bcrypt password hashing, JWT access token (15m) + sha256-hashed refresh token stored in a new `refresh_tokens` table. `class-validator` DTOs + global `ValidationPipe`.
+- `UsersModule`/`UsersService` (findByEmail/create).
+- `LEARNING.md` — personal, gitignored notes explaining Nest/TypeORM internals for learning purposes.
+
+### Fixed
+
+- `data-source.ts`'s `migrations` glob pointed at `src/migrations/*.ts` unconditionally — worked under `ts-node` (CLI) but crashed the compiled app (`dist/`) with a cryptic `SyntaxError: Unexpected strict mode reserved word` (Node trying to parse raw TypeScript as JS). Now resolves relative to `__dirname` with both extensions.
+
+### Changed
+
+- Rebuilt the dev database from scratch through 5 separate TypeORM migrations (`CreateUsers`/`CreateRefreshTokens`/`CreateWorkouts`/`CreateWorkoutExercises`/`CreateSetEntries`, one table per step), and deleted the old hand-written `migrations/0001-0004.sql` — TypeORM's own migration history previously only knew about `refresh_tokens`, so `migration:run` on an empty DB would not have recreated the other 4 tables at all.
