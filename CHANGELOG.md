@@ -61,3 +61,17 @@
 ### Changed (docs)
 
 - `ARCHITECTURE.md` open question "Один email, два способа входа" resolved: merge by email into one `users` row regardless of auth method, whenever Google OAuth is actually implemented (still deferred). "Синхронизация soft-deleted записей" open question marked resolved — implemented, not just decided.
+
+## 2026-09-03
+
+### Removed
+
+- `GET /` (`Hello World` placeholder from `nest new`) and `GET /db-time` (ad-hoc DB-connectivity check used while first setting up TypeORM) — both replaced by a single proper `GET /health`.
+
+### Added
+
+- `GET /health` — `{ status: 'ok', database: 'up' }` on `200`, `{ status: 'error', database: 'down' }` on `503` if Postgres is unreachable (`ServiceUnavailableException`). No auth required.
+
+### Changed
+
+- `app.controller.spec.ts`/`test/app.e2e-spec.ts` updated to test `/health` (both success and DB-down paths) instead of the removed `Hello World` route.

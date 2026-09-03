@@ -1,16 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+
+export interface HealthStatus {
+  status: 'ok';
+  database: 'up';
+}
 
 @Injectable()
 export class AppService {
   constructor(private readonly dataSource: DataSource) {}
 
-  getHello(): string {
-    return 'Hello World!';
-  }
+  async checkHealth(): Promise<HealthStatus> {
+    try {
+      await this.dataSource.query('SELECT 1');
+    } catch {
+      throw new ServiceUnavailableException({
+        status: 'error',
+        database: 'down',
+      });
+    }
 
-  async getDbTime(): Promise<Date> {
-    const result = await this.dataSource.query<{ now: Date }[]>('SELECT NOW()');
-    return result[0].now;
+    return { status: 'ok', database: 'up' };
   }
 }
