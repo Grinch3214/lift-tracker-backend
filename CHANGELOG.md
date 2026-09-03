@@ -50,3 +50,14 @@
 - Rebuilt the dev database from scratch through 5 separate TypeORM migrations (`CreateUsers`/`CreateRefreshTokens`/`CreateWorkouts`/`CreateWorkoutExercises`/`CreateSetEntries`, one table per step), and deleted the old hand-written `migrations/0001-0004.sql` — TypeORM's own migration history previously only knew about `refresh_tokens`, so `migration:run` on an empty DB would not have recreated the other 4 tables at all.
 - Added inverse `@OneToMany` relations (`Workout.workoutExercises`, `WorkoutExercise.setEntries`) — needed for `pull`'s nested `relations` query; no schema change (confirmed via `migration:generate` → empty diff).
 - 3 more one-table-per-step migrations for the catalog domain (`CreateCustomMuscleGroups`/`CreateCustomExercises`/`CreateCatalogOrder`), same narrow-then-widen `entities` technique as before.
+
+### Added (security)
+
+- Rate limiting (`@nestjs/throttler`): global default 100 req/min per IP, tightened to 5 req/min on `POST /auth/register`/`POST /auth/login` specifically (the brute-forceable/spammable ones). Verified live — 6th rapid login attempt returns `429`.
+- `helmet()` — standard security response headers (CSP, `X-Frame-Options`, `X-Content-Type-Options`, HSTS, hides `X-Powered-By`, etc.). Verified live via response headers.
+- CORS enabled (`app.enableCors`), origin list configurable via `CORS_ORIGIN` env var (comma-separated); permissive (`origin: true`, reflects any request origin) when unset — no fixed frontend origin decided yet.
+- `API.md` — plain endpoint reference (method/path/auth/request/response/errors) for frontend integration, separate from `ARCHITECTURE.md`'s design rationale. Manually maintained — must be updated alongside any controller/DTO change.
+
+### Changed (docs)
+
+- `ARCHITECTURE.md` open question "Один email, два способа входа" resolved: merge by email into one `users` row regardless of auth method, whenever Google OAuth is actually implemented (still deferred). "Синхронизация soft-deleted записей" open question marked resolved — implemented, not just decided.
