@@ -75,3 +75,10 @@
 ### Changed
 
 - `app.controller.spec.ts`/`test/app.e2e-spec.ts` updated to test `/health` (both success and DB-down paths) instead of the removed `Hello World` route.
+
+## 2026-09-05
+
+### Changed (docs)
+
+- `ARCHITECTURE.md` §5 corrected a stale plan vs. what the frontend actually shipped: the doc said the client should clear `localStorage` on seeing `rejected: []` from the first `push`. It doesn't and won't — `localStorage` stays a permanent offline cache in front of the backend (matches §1's "не как замена локального хранилища"), never cleared post-sync. `rejected: []` still matters, just for a narrower thing: "first push had no conflicts." Frontend-side sync (push/pull, auth wiring, background triggers) is implemented — see `LiftTracker/docs/02-mvp.md` v1.3 and `LiftTracker/CLAUDE.md` for what actually got built.
+- `ARCHITECTURE.md` §4's endpoint table marked `GET /auth/google`/`GET /auth/google/callback` as not implemented (⏸) — they were listed among this version's endpoints with no inline indicator that they're deferred (the deferral was only noted in §7). `API.md`, the frontend-integration reference, already correctly omits them.
