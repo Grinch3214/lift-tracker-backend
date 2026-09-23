@@ -82,3 +82,17 @@
 
 - `ARCHITECTURE.md` §5 corrected a stale plan vs. what the frontend actually shipped: the doc said the client should clear `localStorage` on seeing `rejected: []` from the first `push`. It doesn't and won't — `localStorage` stays a permanent offline cache in front of the backend (matches §1's "не как замена локального хранилища"), never cleared post-sync. `rejected: []` still matters, just for a narrower thing: "first push had no conflicts." Frontend-side sync (push/pull, auth wiring, background triggers) is implemented — see `LiftTracker/docs/02-mvp.md` v1.3 and `LiftTracker/CLAUDE.md` for what actually got built.
 - `ARCHITECTURE.md` §4's endpoint table marked `GET /auth/google`/`GET /auth/google/callback` as not implemented (⏸) — they were listed among this version's endpoints with no inline indicator that they're deferred (the deferral was only noted in §7). `API.md`, the frontend-integration reference, already correctly omits them.
+
+## 2026-09-07
+
+### Changed
+
+- `JWT_REFRESH_EXPIRES_DAYS` 30 → 60. `JWT_ACCESS_EXPIRES_IN` stays 15m (deliberately — it's the one lever that bounds damage from a stolen/leaked access token, since it can't be revoked; a longer session is `refreshToken`'s job, not this one's).
+
+## 2026-09-23
+
+### Added
+
+- `Dockerfile` — multi-stage build for the app itself (previously only Postgres was containerized via `docker-compose.yml`). `deps`/`build` stages install full deps and run `nest build`; `prod-deps`/`runtime` stages install only `dependencies` (no `typescript`/`@nestjs/cli`/etc.) and run `node dist/main.js` as a non-root user. Built for a home-server deploy (Cloudflare Tunnel, no direct port-forwarding) — not yet build-tested live (Docker daemon was off on this machine; user will validate on the target laptop).
+- `.dockerignore` — excludes `node_modules`, `.git`, `dist`, and critically `.env`/`.env.*` (only `.env.example` is allowed through) from the build context.
+- `migration:run:prod` npm script (`typeorm migration:run -d dist/data-source.js`) — the existing `migration:run` uses `typeorm-ts-node-commonjs`, which needs `ts-node` (a devDependency, absent from the production image). This one runs against the already-compiled `dist/data-source.js` via the plain `typeorm` CLI binary, which ships in the `typeorm` package itself (a regular dependency) — works inside the runtime container with no dev deps installed.
