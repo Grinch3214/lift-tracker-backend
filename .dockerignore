@@ -1,0 +1,16 @@
+node_modules
+dist
+.git
+.vscode
+
+.env
+.env.*
+!.env.example
+
+*.log
+npm-debug.log*
+
+coverage
+.nyc_output
+
+LEARNING.md
