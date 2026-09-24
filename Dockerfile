@@ -4,7 +4,9 @@
 FROM node:22-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+# fetch-timeout/retries — подстраховка от разовых обрывов соединения к registry
+# (актуально на WSL2, где сеть докера иногда подвисает на крупных скачиваниях)
+RUN npm ci --fetch-timeout=100000 --fetch-retries=5
 
 # ---- build: компилируем TypeScript в dist/ ----
 FROM deps AS build
@@ -15,7 +17,7 @@ RUN npm run build
 FROM node:22-slim AS prod-deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --fetch-timeout=100000 --fetch-retries=5
 
 # ---- runtime: финальный образ, ничего лишнего ----
 FROM node:22-slim AS runtime
