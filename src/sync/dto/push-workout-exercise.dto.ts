@@ -20,6 +20,10 @@ export class PushWorkoutExerciseDto {
   @IsInt()
   order?: number;
 
+  @IsOptional()
+  @IsUUID()
+  supersetId?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PushSetEntryDto)

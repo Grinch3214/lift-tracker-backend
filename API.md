@@ -197,6 +197,7 @@ GET /sync/pull?since=2026-09-01T00:00:00.000Z
       id: string;         // UUID
       exerciseId: string; // ссылка в каталог (не FK)
       order?: number;
+      supersetId?: string; // UUID, общая метка для 2+ упражнений в одном суперсете
       sets: [
         {
           id: string;              // UUID

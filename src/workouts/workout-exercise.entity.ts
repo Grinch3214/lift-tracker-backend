@@ -26,13 +26,14 @@ export class WorkoutExercise {
   })
   workout: Workout;
 
-  // Ссылка в каталог упражнений (статичный на фронте или custom_exercises) — сознательно
-  // не FOREIGN KEY, т.к. статичный каталог в БД не хранится. См. ARCHITECTURE.md#3.
   @Column({ type: 'text', name: 'exercise_id' })
   exerciseId: string;
 
   @Column({ type: 'integer', nullable: true })
   order: number | null;
+
+  @Column({ type: 'uuid', name: 'superset_id', nullable: true })
+  supersetId: string | null;
 
   @OneToMany(() => SetEntry, (setEntry) => setEntry.workoutExercise)
   setEntries: SetEntry[];
