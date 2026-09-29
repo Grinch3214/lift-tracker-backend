@@ -46,6 +46,12 @@ export class CustomExercise {
   @Column({ type: 'integer', nullable: true })
   order: number | null;
 
+  // Ссылка на media.id — намеренно без FOREIGN KEY, см. комментарий у muscleGroupId выше:
+  // offline-first клиент может запушить mediaId раньше, чем закачает сам файл через
+  // PUT /media/:id.
+  @Column({ type: 'uuid', name: 'media_id', nullable: true })
+  mediaId: string | null;
+
   @Column({ type: 'boolean', name: 'is_deleted', default: false })
   isDeleted: boolean;
 

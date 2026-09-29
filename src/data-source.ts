@@ -4,6 +4,7 @@ import { RefreshToken } from './auth/refresh-token.entity';
 import { CatalogOrder } from './catalog/catalog-order.entity';
 import { CustomExercise } from './catalog/custom-exercise.entity';
 import { CustomMuscleGroup } from './catalog/custom-muscle-group.entity';
+import { Media } from './media/media.entity';
 import { User } from './users/user.entity';
 import { Workout } from './workouts/workout.entity';
 import { WorkoutExercise } from './workouts/workout-exercise.entity';
@@ -25,6 +26,7 @@ export const dataSourceOptions: DataSourceOptions = {
     CustomMuscleGroup,
     CustomExercise,
     CatalogOrder,
+    Media,
   ],
   // __dirname — это src/ под ts-node (CLI-миграции) и dist/ в собранном приложении,
   // поэтому паттерн сам подхватывает нужное расширение в каждом случае

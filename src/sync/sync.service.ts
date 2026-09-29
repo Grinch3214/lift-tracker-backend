@@ -54,6 +54,7 @@ export interface WireCustomExercise {
   equipment?: string;
   trackingType: string;
   order?: number;
+  mediaId?: string;
   isDeleted: boolean;
   updatedAt: string;
 }
@@ -313,6 +314,7 @@ export class SyncService {
       equipment: incoming.equipment ?? null,
       trackingType: incoming.trackingType,
       order: incoming.order ?? null,
+      mediaId: incoming.mediaId ?? null,
       isDeleted: incoming.isDeleted,
       updatedAt: incomingUpdatedAt,
     });
@@ -388,6 +390,7 @@ export class SyncService {
       equipment: exercise.equipment ?? undefined,
       trackingType: exercise.trackingType,
       order: exercise.order ?? undefined,
+      mediaId: exercise.mediaId ?? undefined,
       isDeleted: exercise.isDeleted,
       updatedAt: exercise.updatedAt.toISOString(),
     };

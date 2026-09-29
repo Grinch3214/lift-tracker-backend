@@ -50,6 +50,9 @@ DEPLOYMENT.md
 .temp
 .tmp
 
+# uploaded user photos (local dev only — prod uses a docker volume, see docker-compose.yml)
+/media
+
 # Runtime data
 pids
 *.pid
