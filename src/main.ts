@@ -3,10 +3,12 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { QueryFailedFilter } from './common/filters/query-failed.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(helmet());
+  app.useGlobalFilters(new QueryFailedFilter());
   // Без CORS_ORIGIN в .env — разрешает любой origin (permissive-дефолт для дев/домашнего хостинга,
   // пока нет фиксированного адреса фронта). Задать список через запятую, когда он появится.
   app.enableCors({
