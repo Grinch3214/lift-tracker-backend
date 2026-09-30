@@ -33,6 +33,9 @@ services:
       POSTGRES_PORT: '5432'
     ports:
       - '6600:6600'
+    volumes:
+      - media_data:/app/media
 
 volumes:
   postgres_data:
+  media_data:

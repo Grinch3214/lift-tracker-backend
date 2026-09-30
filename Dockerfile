@@ -31,6 +31,11 @@ COPY package.json ./
 # Не root — не должно быть причин запускать процесс с правами суперпользователя внутри контейнера
 RUN groupadd --system --gid 1001 nestjs \
   && useradd --system --uid 1001 --gid nestjs nestjs
+
+# Пользовательские фото (media.service.ts) — том монтируется сюда в docker-compose.yml.
+# chown ДО USER: при первом создании именованного тома Docker копирует права из образа.
+RUN mkdir -p /app/media && chown nestjs:nestjs /app/media
+
 USER nestjs
 
 # Порт по умолчанию из .env/main.ts (process.env.PORT ?? 6600)

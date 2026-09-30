@@ -29,6 +29,10 @@ export class PushCustomExerciseDto {
   @IsInt()
   order?: number;
 
+  @IsOptional()
+  @IsUUID()
+  mediaId?: string;
+
   @IsBoolean()
   isDeleted: boolean;
 

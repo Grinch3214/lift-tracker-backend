@@ -37,6 +37,7 @@ lerna-debug.log*
 
 # personal learning notes, not for the repo
 LEARNING.md
+DEPLOYMENT.md
 
 # dotenv environment variable files
 .env
@@ -48,6 +49,9 @@ LEARNING.md
 # temp directory
 .temp
 .tmp
+
+# uploaded user photos (local dev only — prod uses a docker volume, see docker-compose.yml)
+/media
 
 # Runtime data
 pids

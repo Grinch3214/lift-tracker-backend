@@ -27,6 +27,7 @@ export interface WireWorkoutExercise {
   id: string;
   exerciseId: string;
   order?: number;
+  supersetId?: string;
   sets: WireSetEntry[];
 }
 
@@ -53,6 +54,7 @@ export interface WireCustomExercise {
   equipment?: string;
   trackingType: string;
   order?: number;
+  mediaId?: string;
   isDeleted: boolean;
   updatedAt: string;
 }
@@ -203,6 +205,23 @@ export class SyncService {
         return { accepted: false, current: this.workoutToWire(existing) };
       }
 
+      // (user_id, date) уникален на уровне БД (один воркаут в день) — если под
+      // ДРУГИМ id уже есть запись на ту же дату, INSERT ниже уронит необработанный
+      // QueryFailedError (23505) и клиент получит голый 500 вместо rejected. Разрешаем
+      // конфликт здесь той же LWW-логикой, что и конфликт по id.
+      const dateConflict = await manager.findOne(Workout, {
+        where: { userId, date: incoming.date },
+        relations: ['workoutExercises', 'workoutExercises.setEntries'],
+      });
+
+      if (dateConflict && dateConflict.id !== incoming.id) {
+        if (dateConflict.updatedAt >= incomingUpdatedAt) {
+          return { accepted: false, current: this.workoutToWire(dateConflict) };
+        }
+        // CASCADE унесёт её workout_exercises/set_entries
+        await manager.delete(Workout, { id: dateConflict.id });
+      }
+
       if (existing) {
         // проще удалить старые exercises (CASCADE унесёт их sets) и вставить заново,
         // чем построчно диффать — см. ARCHITECTURE.md, раздел "Транзакции"
@@ -223,6 +242,7 @@ export class SyncService {
           workoutId: incoming.id,
           exerciseId: exercise.exerciseId,
           order: exercise.order ?? null,
+          supersetId: exercise.supersetId ?? null,
         });
 
         for (const set of exercise.sets) {
@@ -294,6 +314,7 @@ export class SyncService {
       equipment: incoming.equipment ?? null,
       trackingType: incoming.trackingType,
       order: incoming.order ?? null,
+      mediaId: incoming.mediaId ?? null,
       isDeleted: incoming.isDeleted,
       updatedAt: incomingUpdatedAt,
     });
@@ -336,6 +357,7 @@ export class SyncService {
         id: exercise.id,
         exerciseId: exercise.exerciseId,
         order: exercise.order ?? undefined,
+        supersetId: exercise.supersetId ?? undefined,
         sets: (exercise.setEntries ?? []).map((set) => ({
           id: set.id,
           weight: set.weight !== null ? Number(set.weight) : undefined,
@@ -368,6 +390,7 @@ export class SyncService {
       equipment: exercise.equipment ?? undefined,
       trackingType: exercise.trackingType,
       order: exercise.order ?? undefined,
+      mediaId: exercise.mediaId ?? undefined,
       isDeleted: exercise.isDeleted,
       updatedAt: exercise.updatedAt.toISOString(),
     };
